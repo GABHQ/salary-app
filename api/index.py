@@ -34,84 +34,141 @@ async def serve_home():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>Smart Salary Pro 2026</title>
+        <title>Smart Salary Pro</title>
+        <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <style>
-            :root { --bg: #ffffff; --card: #f9fafb; --text: #111827; --accent: #00acc1; }
-            body.dark { --bg: #111827; --card: #1f2937; --text: #f9fafb; --accent: #26c6da; }
-            body { background-color: var(--bg); color: var(--text); transition: 0.3s; margin: 0; padding-bottom: 80px; }
-            .card { background-color: var(--card); border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); }
-            .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: flex-end; z-index: 500; }
-            .modal-content { background: var(--bg); border-radius: 24px 24px 0 0; padding: 24px; width: 100%; max-height: 90vh; overflow-y: auto; }
-            .info-i { font-size: 14px; color: var(--accent); cursor: pointer; margin-right: 4px; }
-            .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); height: 70px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(0,0,0,0.1); z-index: 400; }
-            .nav-item { opacity: 0.4; transition: 0.2s; text-align: center; }
-            .nav-item.active { opacity: 1; color: var(--accent); }
-            input, select, textarea { background: var(--card) !important; color: var(--text) !important; border: 1px solid rgba(0,0,0,0.1) !important; width: 100%; padding: 12px; border-radius: 12px; }
+            :root { 
+                --bg: #f8fafc; --card: rgba(255, 255, 255, 0.8); --text: #0f172a; 
+                --accent: #06b6d4; --nav-bg: rgba(255, 255, 255, 0.7); 
+            }
+            body.dark { 
+                --bg: #020617; --card: rgba(30, 41, 59, 0.7); --text: #f1f5f9; 
+                --accent: #22d3ee; --nav-bg: rgba(15, 23, 42, 0.8); 
+            }
+            
+            body { 
+                font-family: 'Heebo', sans-serif;
+                background-color: var(--bg); 
+                color: var(--text); 
+                transition: background 0.4s ease;
+                margin: 0; padding-bottom: 90px;
+                overflow-x: hidden;
+            }
+
+            /* Glassmorphism Effect */
+            .glass {
+                backdrop-filter: blur(16px) saturate(180%);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                background-color: var(--nav-bg);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .card { 
+                background-color: var(--card); 
+                backdrop-filter: blur(8px);
+                border-radius: 28px; 
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+                transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+            }
+            .card:active { transform: scale(0.96); }
+
+            .modal { 
+                display: none; position: fixed; inset: 0; 
+                background: rgba(0, 0, 0, 0.4); 
+                backdrop-filter: blur(4px);
+                align-items: flex-end; z-index: 500; 
+            }
+            .modal-content { 
+                background: var(--bg); 
+                border-radius: 40px 40px 0 0; 
+                padding: 32px; width: 100%; 
+                box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+                animation: slideUp 0.4s cubic-bezier(0, 0.55, 0.45, 1);
+            }
+            @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+            .nav-item { transition: all 0.3s ease; position: relative; }
+            .nav-item.active { color: var(--accent); transform: translateY(-4px); }
+            .nav-item.active::after {
+                content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+                width: 4px; height: 4px; background: var(--accent); border-radius: 50%;
+            }
+
+            input, select, textarea { 
+                background: var(--card) !important; 
+                border: 2px solid transparent !important;
+                border-radius: 18px !important;
+                padding: 14px !important;
+                transition: border 0.3s ease;
+            }
+            input:focus { border-color: var(--accent) !important; }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+                box-shadow: 0 10px 20px -10px #06b6d4;
+            }
+
+            .fade-in { animation: fadeIn 0.5s ease-out; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         </style>
     </head>
-    <body class="font-sans">
-
-        <header class="bg-cyan-600 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-50">
-            <h1 id="view-title" class="text-lg font-bold">טוען...</h1>
-            <span class="material-icons cursor-pointer" onclick="openShiftModal()">add_circle</span>
+    <body class="dark"> <header class="glass p-5 flex justify-between items-center sticky top-0 z-50">
+            <h1 id="view-title" class="text-xl font-black tracking-tight">Smart Salary</h1>
+            <div class="flex gap-4">
+                <span class="material-icons cursor-pointer opacity-70" onclick="setTheme(document.body.classList.contains('dark') ? 'light' : 'dark')">dark_mode</span>
+                <span class="material-icons cursor-pointer text-cyan-400 scale-125" onclick="openShiftModal()">add_circle</span>
+            </div>
         </header>
 
-        <main id="main-content" class="p-4">
+        <main id="main-content" class="p-6 space-y-6">
             </main>
 
-        <nav class="bottom-nav">
-            <div class="nav-item" onclick="setView('home')" id="nav-home"><span class="material-icons">dashboard</span><p class="text-[10px]">ראשי</p></div>
-            <div class="nav-item" onclick="setView('jobs')" id="nav-jobs"><span class="material-icons">work</span><p class="text-[10px]">עבודות</p></div>
-            <div class="nav-item" id="nav-stats"><span class="material-icons">analytics</span><p class="text-[10px]">ניתוח</p></div>
-            <div class="nav-item" onclick="openSettings()" id="nav-settings"><span class="material-icons">settings</span><p class="text-[10px]">הגדרות</p></div>
+        <nav class="glass fixed bottom-0 left-0 right-0 h-20 flex justify-around items-center z-[400] rounded-t-[32px]">
+            <div class="nav-item" onclick="setView('home')" id="nav-home"><span class="material-icons">grid_view</span></div>
+            <div class="nav-item" onclick="setView('jobs')" id="nav-jobs"><span class="material-icons">account_balance_wallet</span></div>
+            <div class="nav-item" id="nav-stats"><span class="material-icons">leaderboard</span></div>
+            <div class="nav-item" onclick="openSettings()" id="nav-settings"><span class="material-icons">tune</span></div>
         </nav>
 
         <div id="settingsModal" class="modal" onclick="if(event.target==this)closeAll()">
             <div class="modal-content">
-                <h2 class="font-bold mb-4 border-b pb-2">ניהול עבודות והגדרות</h2>
-                <div id="jobs-manager-list" class="space-y-2 mb-6"></div>
-                <div class="card p-4">
-                    <p class="font-bold text-xs mb-3 opacity-50 uppercase">הוספת עבודה</p>
-                    <div class="space-y-3">
-                        <input id="j_name" placeholder="שם העבודה">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input id="j_rate" type="number" placeholder="שכר שעתי">
-                            <select id="j_culture"><option value="jewish">יהודי (חגים/שבת)</option><option value="muslim">מוסלמי</option></select>
-                        </div>
-                        <div class="text-[10px] space-y-1 opacity-70">
-                            <p>125% אחרי: <input id="j_ot1" type="number" value="8.5" class="w-12 p-1 inline"> שעות <i class="material-icons info-i" onclick="showInfo('ot')">info</i></p>
-                            <p>150% אחרי: <input id="j_ot2" type="number" value="10.5" class="w-12 p-1 inline"> שעות</p>
-                        </div>
-                        <button onclick="saveJob()" class="w-full bg-cyan-600 text-white py-3 rounded-xl font-bold">שמור עבודה</button>
+                <h2 class="text-2xl font-black mb-6">הגדרות</h2>
+                <div id="jobs-manager-list" class="space-y-3 mb-8"></div>
+                <div class="card p-6 space-y-4">
+                    <p class="text-xs font-bold opacity-40 uppercase tracking-widest">הוספת עבודה חדשה</p>
+                    <input id="j_name" placeholder="שם העבודה (למשל: גוסטה)">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="j_rate" type="number" placeholder="שכר שעתי">
+                        <select id="j_culture"><option value="jewish">יהודי ✡️</option><option value="muslim">מוסלמי ☪️</option></select>
                     </div>
+                    <button onclick="saveJob()" class="btn-primary w-full text-white py-4 rounded-2xl font-bold">צור עבודה</button>
                 </div>
-                <button onclick="closeAll()" class="w-full mt-6 py-4 bg-gray-100 rounded-xl font-bold dark:bg-gray-800">סגור</button>
             </div>
         </div>
 
         <div id="shiftModal" class="modal" onclick="if(event.target==this)closeAll()">
             <div class="modal-content">
-                <h2 class="font-bold mb-4 text-center text-cyan-600">תיעוד משמרת</h2>
+                <h2 class="text-2xl font-black mb-6 text-cyan-500">תיעוד משמרת</h2>
                 <div class="space-y-4">
                     <div id="job-selector-container">
-                        <label class="text-[10px] opacity-50">עבודה:</label>
                         <select id="s_job"></select>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <input type="date" id="s_date">
                         <div class="flex gap-2">
-                            <input type="time" id="s_start">
-                            <input type="time" id="s_end">
+                            <input type="time" id="s_start" value="18:00">
+                            <input type="time" id="s_end" value="02:00">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <input type="number" id="s_break" placeholder="הפסקה (דק')">
                         <input type="number" id="s_extra" placeholder="בונוס/טיפ">
                     </div>
-                    <textarea id="s_notes" placeholder="הערות למשמרת (למשל: 'היה עומס מטורף', 'סגירת קופה')" rows="2"></textarea>
-                    <button onclick="saveShift()" class="w-full bg-cyan-600 text-white py-4 rounded-xl font-bold shadow-lg">שמור</button>
+                    <textarea id="s_notes" placeholder="הערות אישיות..." rows="2"></textarea>
+                    <button onclick="saveShift()" class="btn-primary w-full text-white py-4 rounded-2xl font-bold">שמור משמרת</button>
                 </div>
             </div>
         </div>
@@ -123,15 +180,18 @@ async def serve_home():
             let currentJobId = localStorage.getItem('lastJobId') || null;
 
             window.onload = () => {
-                applyTheme();
+                applySettings();
                 renderView();
             };
 
-            function showInfo(type) {
-                const info = {
-                    ot: "לפי חוק שעות עבודה ומנוחה: משמרת רגילה היא 8.4 שעות (במשרה של 5 ימים). השעתיים הראשונות מעבר לכך מזכות ב-125%, וכל שעה נוספת ב-150%. מקור: כל-זכות."
-                };
-                alert(info[type]);
+            function applySettings() {
+                const theme = localStorage.getItem('theme') || 'dark';
+                document.body.className = theme;
+            }
+
+            function setTheme(t) {
+                document.body.className = t;
+                localStorage.setItem('theme', t);
             }
 
             function setView(view, jobId = null) {
@@ -144,15 +204,19 @@ async def serve_home():
 
             function renderView() {
                 const main = document.getElementById('main-content');
+                main.innerHTML = '';
+                main.classList.add('fade-in');
+                setTimeout(() => main.classList.remove('fade-in'), 500);
+
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 
                 if (currentView === 'home') {
                     document.getElementById('nav-home').classList.add('active');
-                    document.getElementById('view-title').innerText = 'סקירה כללית';
+                    document.getElementById('view-title').innerText = 'הארנק שלי';
                     renderHome(main);
                 } else if (currentView === 'jobs') {
                     document.getElementById('nav-jobs').classList.add('active');
-                    document.getElementById('view-title').innerText = 'העבודות שלי';
+                    document.getElementById('view-title').innerText = 'מקומות עבודה';
                     renderJobsList(main);
                 } else if (currentView === 'job') {
                     document.getElementById('nav-jobs').classList.add('active');
@@ -164,19 +228,26 @@ async def serve_home():
 
             function renderHome(container) {
                 const totalGross = shifts.reduce((acc, s) => acc + s.data.total_pay, 0);
-                const totalNet = totalGross * 0.90; // הערכה גסה לנטו (ביטוח לאומי + בריאות)
                 container.innerHTML = `
-                    <div class="card p-8 mb-6 text-center border-t-4 border-cyan-500">
-                        <p class="text-[10px] uppercase font-bold opacity-50">ברוטו חודשי</p>
-                        <p class="text-4xl font-black text-cyan-600">₪${totalGross.toLocaleString()}</p>
-                        <p class="text-xs mt-2 opacity-60 italic">נטו משוער: ₪${totalNet.toLocaleString()}</p>
+                    <div class="card p-10 text-center relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full -mr-16 -mt-16"></div>
+                        <p class="text-[11px] font-black uppercase opacity-40 tracking-widest mb-2">סה"כ הכנסות (ברוטו)</p>
+                        <p class="text-5xl font-black text-cyan-500">₪${totalGross.toLocaleString()}</p>
                     </div>
-                    <h3 class="font-bold mb-4 text-sm opacity-70">10 משמרות אחרונות</h3>
-                    <div class="space-y-3">
-                        ${shifts.sort((a,b) => new Date(b.start) - new Date(a.start)).slice(0,10).map(s => `
-                            <div class="card p-4 flex justify-between items-center" onclick="alert('הערות: ${s.notes || "אין"}')">
-                                <div><p class="text-[9px] font-bold text-cyan-600 uppercase">${s.jobName}</p><p class="text-xs opacity-50">${s.start.split('T')[0]}</p></div>
-                                <div class="font-bold">₪${s.data.total_pay}</div>
+                    <div class="flex justify-between items-center px-2">
+                        <h3 class="font-bold text-lg">פעולות אחרונות</h3>
+                        <span class="text-xs text-cyan-500 font-bold">הכל</span>
+                    </div>
+                    <div class="space-y-4">
+                        ${shifts.sort((a,b) => new Date(b.start) - new Date(a.start)).slice(0,8).map(s => `
+                            <div class="card p-5 flex justify-between items-center" onclick="alert('${s.notes || "אין הערות"}')">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-cyan-500/20 rounded-2xl flex items-center justify-center text-cyan-500">
+                                        <span class="material-icons">payments</span>
+                                    </div>
+                                    <div><p class="font-black text-sm uppercase tracking-tighter">${s.jobName}</p><p class="text-[10px] opacity-40">${s.start.split('T')[0]}</p></div>
+                                </div>
+                                <div class="font-black text-lg">₪${s.data.total_pay}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -185,50 +256,48 @@ async def serve_home():
 
             function renderJobsList(container) {
                 container.innerHTML = jobs.map(j => `
-                    <div class="card p-5 mb-3 flex justify-between items-center" onclick="setView('job', ${j.id})">
-                        <span class="font-bold text-lg">${j.name} • <span class="text-xs opacity-50">${j.rate}₪</span></span>
-                        <span class="material-icons opacity-30">chevron_left</span>
+                    <div class="card p-6 flex justify-between items-center" onclick="setView('job', ${j.id})">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-gray-500/10 rounded-3xl flex items-center justify-center text-2xl font-black text-cyan-500">
+                                ${j.name.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="font-black text-xl">${j.name}</p>
+                                <p class="text-xs opacity-40">${j.rate}₪ לשעה • ${j.type === 'monthly' ? 'גלובלי' : 'שעתי'}</p>
+                            </div>
+                        </div>
+                        <span class="material-icons opacity-20">arrow_back_ios</span>
                     </div>
-                `).join('');
+                `).join('') + (jobs.length === 0 ? '<p class="text-center opacity-40 py-20">אין עבודות? הוסף אחת בהגדרות</p>' : '');
             }
 
             function renderJobDetails(container, job) {
                 const jobShifts = shifts.filter(s => s.jobId == job.id).sort((a,b) => new Date(b.start) - new Date(a.start));
-                const totalHours = jobShifts.reduce((acc, s) => acc + s.data.hours, 0);
-                const totalPay = jobShifts.reduce((acc, s) => acc + s.data.total_pay, 0);
-                
                 container.innerHTML = `
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         ${jobShifts.map(s => `
-                            <div class="card p-4 flex justify-between items-center" onclick="alert('סיכום משמרת:\\nשעות: ${s.data.hours.toFixed(2)}\\nהערות: ${s.notes || "אין"}')">
-                                <div><p class="text-xs opacity-40">${s.start.split('T')[0]}</p><p class="font-bold text-sm">${s.start.split('T')[1]} - ${s.end.split('T')[1]}</p></div>
-                                <div class="text-right"><p class="text-lg font-black text-cyan-600">₪${s.data.total_pay}</p></div>
+                            <div class="card p-5 flex justify-between items-center">
+                                <div><p class="text-[10px] opacity-40 font-bold">${s.start.split('T')[0]}</p><p class="font-black">${s.start.split('T')[1]} - ${s.end.split('T')[1]}</p></div>
+                                <div class="text-right">
+                                    <p class="text-xl font-black text-cyan-500">₪${s.data.total_pay}</p>
+                                    <span class="text-[9px] font-bold text-red-400" onclick="deleteShift(${s.id})">מחיקה</span>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
-                    <footer class="fixed bottom-[70px] left-0 right-0 bg-cyan-700 text-white p-4 flex justify-around font-bold">
-                        <div class="text-center"><p class="text-[9px] opacity-70">שעות</p>${totalHours.toFixed(2)}</div>
-                        <div class="text-center"><p class="text-[9px] opacity-70">שכר</p>₪${totalPay.toLocaleString()}</div>
-                    </footer>
+                    <div class="glass fixed bottom-20 left-0 right-0 p-6 flex justify-around items-center border-t border-white/5">
+                        <div class="text-center"><p class="text-[10px] font-bold opacity-40 uppercase">שעות</p><p class="text-xl font-black">${jobShifts.reduce((acc,s)=>acc+s.data.hours,0).toFixed(1)}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold opacity-40 uppercase">ברוטו</p><p class="text-xl font-black text-cyan-500">₪${jobShifts.reduce((acc,s)=>acc+s.data.total_pay,0).toLocaleString()}</p></div>
+                    </div>
                 `;
             }
 
             function openShiftModal() {
-                if(jobs.length === 0) return alert('הוסף עבודה בהגדרות קודם');
-                
-                // הוספת עבודה אוטומטית לפי ההקשר
-                const selector = document.getElementById('job-selector-container');
+                const sel = document.getElementById('job-selector-container');
                 const select = document.getElementById('s_job');
                 select.innerHTML = jobs.map(j => `<option value="${j.id}">${j.name}</option>`).join('');
-                
-                if (currentView === 'job' && currentJobId) {
-                    select.value = currentJobId;
-                    selector.classList.add('hidden'); // אל תשאל שוב אם אני כבר בתוך העבודה
-                } else {
-                    selector.classList.remove('hidden');
-                }
-                
-                document.getElementById('s_date').value = new Date().toISOString().split('T')[0];
+                if (currentView === 'job') { select.value = currentJobId; sel.classList.add('hidden'); }
+                else { sel.classList.remove('hidden'); }
                 document.getElementById('shiftModal').style.display = 'flex';
             }
 
@@ -236,15 +305,9 @@ async def serve_home():
                 const name = document.getElementById('j_name').value;
                 const rate = document.getElementById('j_rate').value;
                 if(!name || !rate) return;
-                jobs.push({ 
-                    id: Date.now(), name, rate: parseFloat(rate), 
-                    ot1: parseFloat(document.getElementById('j_ot1').value),
-                    ot2: parseFloat(document.getElementById('j_ot2').value),
-                    culture: document.getElementById('j_culture').value
-                });
+                jobs.push({ id: Date.now(), name, rate: parseFloat(rate), type: 'hourly' });
                 localStorage.setItem('jobs', JSON.stringify(jobs));
-                closeAll();
-                renderView();
+                closeAll(); renderView();
             }
 
             async function saveShift() {
@@ -253,36 +316,28 @@ async def serve_home():
                 const start = document.getElementById('s_date').value + 'T' + document.getElementById('s_start').value;
                 const end = document.getElementById('s_date').value + 'T' + document.getElementById('s_end').value;
 
-                try {
-                    const res = await fetch('/api/calculate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            start_time: start, end_time: end, base_rate: job.rate,
-                            break_mins: parseInt(document.getElementById('s_break').value || 0),
-                            extra_pay: parseFloat(document.getElementById('s_extra').value || 0),
-                            overtime_125_after: job.ot1, overtime_150_after: job.ot2
-                        })
-                    });
-                    const data = await res.json();
-                    shifts.push({ 
-                        id: Date.now(), jobId, jobName: job.name, start, end, data, 
-                        notes: document.getElementById('s_notes').value 
-                    });
-                    localStorage.setItem('shifts', JSON.stringify(shifts));
-                    closeAll();
-                    renderView();
-                } catch(e) { alert('שגיאה בחישוב'); }
+                const res = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        start_time: start, end_time: end, base_rate: job.rate,
+                        break_mins: parseInt(document.getElementById('s_break').value || 0),
+                        extra_pay: parseFloat(document.getElementById('s_extra').value || 0)
+                    })
+                });
+                const data = await res.json();
+                shifts.push({ id: Date.now(), jobId, jobName: job.name, start, end, data, notes: document.getElementById('s_notes').value });
+                localStorage.setItem('shifts', JSON.stringify(shifts));
+                closeAll(); renderView();
             }
 
             function closeAll() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
             function openSettings() { renderJobsManager(); document.getElementById('settingsModal').style.display = 'flex'; }
             function renderJobsManager() {
-                document.getElementById('jobs-manager-list').innerHTML = jobs.map(j => `<div class="card p-3 flex justify-between items-center mb-2"><span class="text-sm font-bold">${j.name}</span><span class="material-icons text-red-400 text-sm cursor-pointer" onclick="deleteJob(${j.id})">delete</span></div>`).join('');
+                document.getElementById('jobs-manager-list').innerHTML = jobs.map(j => `<div class="card p-4 flex justify-between mb-2"><span class="font-bold">${j.name}</span><span class="material-icons text-red-400 text-sm" onclick="deleteJob(${j.id})">delete</span></div>`).join('');
             }
-            function deleteJob(id) { jobs = jobs.filter(j => j.id != id); localStorage.setItem('jobs', JSON.stringify(jobs)); renderJobsManager(); renderView(); }
-            function applyTheme() { if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark'); }
-            function setTheme(t) { document.body.classList.toggle('dark', t==='dark'); localStorage.setItem('theme', t); }
+            function deleteJob(id) { jobs = jobs.filter(j=>j.id!=id); localStorage.setItem('jobs', JSON.stringify(jobs)); renderJobsManager(); renderView(); }
+            function deleteShift(id) { if(confirm('למחוק?')) { shifts = shifts.filter(s=>s.id!=id); localStorage.setItem('shifts', JSON.stringify(shifts)); renderView(); } }
         </script>
     </body>
     </html>
@@ -290,21 +345,18 @@ async def serve_home():
 
 @app.post("/api/calculate")
 async def calculate(shift: ShiftRequest):
+    # (Same Python logic as before - calculating overtime and holidays)
     start = parser.isoparse(shift.start_time).astimezone(TIMEZONE)
     end = parser.isoparse(shift.end_time).astimezone(TIMEZONE)
     if end < start: end += timedelta(days=1)
-    
     holidays = get_holidays(start.year)
     total_pay = 0
     curr = start
     step = timedelta(minutes=15)
-    
-    # חישוב משך משמרת ברוטו בשעות
     duration_hours = (end - start).total_seconds() / 3600
     actual_work_hours = duration_hours - (shift.break_mins / 60)
     
     while curr < end:
-        # בדיקת חג/שבת
         mult = 1.0
         if (curr.weekday() == 4 and curr.hour >= 18) or (curr.weekday() == 5 and curr.hour < 20):
             mult = 1.5
@@ -313,18 +365,12 @@ async def calculate(shift: ShiftRequest):
                 mult = shift.holiday_rate
                 break
         
-        # חישוב שעות נוספות לפי זמן יחסי במשמרת
-        elapsed_hours = (curr - start).total_seconds() / 3600
-        if elapsed_hours >= shift.overtime_150_after:
-            mult = max(mult, 1.5)
-        elif elapsed_hours >= shift.overtime_125_after:
-            mult = max(mult, 1.25)
+        elapsed = (curr - start).total_seconds() / 3600
+        if elapsed >= shift.overtime_150_after: mult = max(mult, 1.5)
+        elif elapsed >= shift.overtime_125_after: mult = max(mult, 1.25)
             
         total_pay += (shift.base_rate * mult) * (15/60)
         curr += step
 
-    # קיזוז הפסקה לפי שכר בסיס
-    deduction = (shift.break_mins / 60) * shift.base_rate
-    final_pay = round(total_pay - deduction + shift.extra_pay, 2)
-    
+    final_pay = round(total_pay - ((shift.break_mins / 60) * shift.base_rate) + shift.extra_pay, 2)
     return {"total_pay": max(0, final_pay), "hours": actual_work_hours}
