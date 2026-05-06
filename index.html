@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון שכר 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .header { background-color: #00acc1; color: white; }
+        .fab { position: fixed; bottom: 24px; right: 24px; background-color: #e91e63; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; transition: 0.2s; }
+        .fab:active { transform: scale(0.9); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <header class="header p-4 shadow-md flex justify-between items-center">
+        <span class="material-icons">menu</span>
+        <h1 class="text-xl font-bold">מאי 2026</h1>
+        <span class="material-icons">wb_incandescent</span>
+    </header>
+
+    <main id="shift-container" class="p-4 space-y-3">
+        <div class="bg-white p-4 rounded-lg shadow-sm border-r-4 border-cyan-500 flex justify-between items-center">
+            <div>
+                <p class="text-xs text-gray-400">דוגמה</p>
+                <p class="font-bold">20:30 - 01:25</p>
+            </div>
+            <div class="text-xl font-bold text-cyan-600">₪ 0.00</div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 bg-[#4dd0e1] text-white p-3 flex justify-around text-center text-sm font-bold shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+        <div><p>שעות: <span id="total-hours">0.00</span></p></div>
+        <div><p>סה"כ: ₪ <span id="total-money">0.00</span></p></div>
+    </footer>
+
+    <div class="fab text-white" onclick="triggerShiftDialog()">
+        <span class="material-icons text-3xl">add</span>
+    </div>
+
+    <script>
+        let shifts = [];
+
+        async function triggerShiftDialog() {
+            const start = prompt("זמן התחלה (YYYY-MM-DD HH:mm)", "2026-05-02 20:30");
+            const end = prompt("זמן סיום (YYYY-MM-DD HH:mm)", "2026-05-03 01:25");
+            const rate = prompt("שכר שעתי (בסיס)", "45");
+
+            if (!start || !end || !rate) return;
+
+            // קריאה ל-API ב-Vercel
+            try {
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        start_time: start.replace(" ", "T"),
+                        end_time: end.replace(" ", "T"),
+                        base_rate: parseFloat(rate)
+                    })
+                });
+
+                const data = await response.json();
+                addShiftToUI(start, end, data);
+            } catch (e) {
+                alert("שגיאה בחישוב: " + e.message);
+            }
+        }
+
+        function addShiftToUI(start, end, data) {
+            const container = document.getElementById('shift-container');
+            const shiftHtml = `
+                <div class="bg-white p-4 rounded-lg shadow-sm border-r-4 border-cyan-600 flex justify-between items-center animate-fade-in">
+                    <div>
+                        <p class="text-xs text-gray-500">${new Date(start).toLocaleDateString('he-IL')}</p>
+                        <p class="font-bold">${start.split(" ")[1]} - ${end.split(" ")[1]}</p>
+                    </div>
+                    <div class="text-xl font-bold text-cyan-600">₪ ${data.total_pay}</div>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', shiftHtml);
+            
+            // עדכון סיכום
+            document.getElementById('total-hours').innerText = (parseFloat(document.getElementById('total-hours').innerText) + data.hours).toFixed(2);
+            document.getElementById('total-money').innerText = (parseFloat(document.getElementById('total-money').innerText) + data.total_pay).toFixed(2);
+        }
+    </script>
+</body>
+</html>
