@@ -35,14 +35,14 @@ async def serve_home():
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <style>
-            :root { --main-bg: #ffffff; --card-bg: #f9fafb; --text-main: #111827; --accent: #00acc1; }
-            body.dark { --main-bg: #111827; --card-bg: #1f2937; --text-main: #f9fafb; --accent: #26c6da; }
-            body { background-color: var(--main-bg); color: var(--text-main); transition: 0.3s; margin: 0; }
-            .card { background-color: var(--card-bg); border: 1px solid rgba(0,0,0,0.05); }
-            .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: flex-end; z-index: 200; }
-            .modal-content { background: var(--main-bg); color: var(--text-main); border-radius: 24px 24px 0 0; padding: 24px; }
-            input, select { background: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
-            .hidden { display: none; }
+            :root { --bg: #ffffff; --card: #f3f4f6; --text: #111827; --accent: #00acc1; }
+            body.dark { --bg: #111827; --card: #1f2937; --text: #f9fafb; --accent: #26c6da; }
+            body { background-color: var(--bg); color: var(--text); transition: 0.3s; }
+            .card { background-color: var(--card); color: var(--text); }
+            .drawer { background-color: var(--bg); color: var(--text); }
+            /* כפייה של המשתנים על אלמנטים של Tailwind */
+            .bg-white, .bg-gray-100 { background-color: var(--bg) !important; }
+            .text-gray-800, .text-gray-900 { color: var(--text) !important; }
         </style>
     </head>
     <body class="font-sans">
